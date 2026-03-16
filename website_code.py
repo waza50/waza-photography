@@ -6,14 +6,12 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
 base_dir = os.path.dirname(__file__)
-
 paths = {
     "main": os.path.join(base_dir, "web_images"),
     "home": os.path.join(base_dir, "web_images", "home_file"),
     "gallery": os.path.join(base_dir, "web_images", "gallery_images")
 }
 paths["themes"] = os.path.join(paths["gallery"], "gallery_themes")
-
 gallery_folders = {
     "Nature": os.path.join(paths["themes"], "nature_file"),
     "Landscape": os.path.join(paths["themes"], "landscape_file"),
@@ -86,14 +84,27 @@ object-fit:cover;
 }
 .hero-text{
 position:absolute;
+top:50%;
 left:50%;
-transform:translateX(-50%);
+transform:translate(-50%,-50%);
 color:white;
 background:rgba(0,0,0,.45);
-padding:10px 20px;
+padding:25px;
 border-radius:6px;
 text-align:center;
-bottom:20px;
+}
+.hero-text a.banner-text{
+display:inline-block;
+margin-top:15px;
+font-size:1.25rem;
+color:white;
+text-decoration:none;
+background:rgba(0,0,0,0.45);
+padding:10px 20px;
+border-radius:6px;
+}
+.hero-text a.banner-text:hover{
+background:rgba(0,0,0,0.6);
 }
 .lightbox{
 display:none;
@@ -165,21 +176,19 @@ lightbox_html = """
 """
 
 def generate_website():
-    # Update metadata for new images
-    all_folders = [paths["home"]] + list(gallery_folders.values())
+    all_folders=[paths["home"]]+list(gallery_folders.values())
     for folder in all_folders:
         for img in get_images(folder):
-            img_path = os.path.join(folder,img).replace("\\","/")
+            img_path=os.path.join(folder,img).replace("\\","/")
             if img_path not in image_metadata:
                 image_metadata[img_path]={"title":"","description":""}
     with open(metadata_file,"w",encoding="utf-8") as f:
         json.dump(image_metadata,f,indent=4)
 
-    # Home Page
-    home_images = get_images(paths["home"])
-    hero_image = "web_images/home_file/Royal Archway.jpg"  # Set hero image
-
-    home_html = f"""
+    # Home page
+    home_images=get_images(paths["home"])
+    hero_image="web_images/home_file/Royal Archway.jpg"  # <-- Set the hero image
+    home_html=f"""
 <!DOCTYPE html>
 <html>
 <head>
@@ -195,6 +204,8 @@ def generate_website():
 <header class="hero">
 <img src="{hero_image}" loading="eager">
 <div class="hero-text">
+<h1>Waza Photography</h1>
+<p>Discover the captivating world of Waza Photography</p>
 <a href="gallery.html" class="banner-text">Explore the Gallery</a>
 </div>
 </header>
@@ -204,9 +215,9 @@ def generate_website():
 """
 
     for img in home_images:
-        img_path = f"web_images/home_file/{img}"
-        title,desc = get_meta(img_path)
-        home_html += f"""
+        img_path=f"web_images/home_file/{img}"
+        title,desc=get_meta(img_path)
+        home_html+=f"""
 <div class="col-md-4">
 <sl-card>
 <img src="{img_path}" class="gallery-img"
@@ -221,7 +232,8 @@ alt="{title}">
 </sl-card>
 </div>
 """
-    home_html += f"""
+
+    home_html+=f"""
 </div>
 </section>
 <footer class="text-center text-muted py-4 bg-light">
@@ -234,8 +246,8 @@ alt="{title}">
     with open(os.path.join(base_dir,"index.html"),"w",encoding="utf-8") as f:
         f.write(home_html)
 
-    # Gallery Page
-    gallery_html = f"""
+    # Gallery page
+    gallery_html=f"""
 <!DOCTYPE html>
 <html>
 <head>
@@ -249,21 +261,23 @@ alt="{title}">
 <body>
 {navbar}
 """
+
     for name,folder in gallery_folders.items():
-        images = get_images(folder)
-        gallery_html += f"""
+        images=get_images(folder)
+        gallery_html+=f"""
 <section class="container my-5">
 <h2>{name}</h2>
 <div class="row g-3">
 """
-        folder_name = folder.split(os.sep)[-1]
+        folder_name=folder.split(os.sep)[-1]
         for img in images:
-            img_path = f"web_images/gallery_images/gallery_themes/{folder_name}/{img}"
-            title,desc = get_meta(img_path)
-            gallery_html += f"""
+            img_path=f"web_images/gallery_images/gallery_themes/{folder_name}/{img}"
+            title,desc=get_meta(img_path)
+            gallery_html+=f"""
 <div class="col-md-4">
 <sl-card>
-<img src="{img_path}" class="gallery-img"
+<img src="{img_path}"
+class="gallery-img"
 loading="lazy"
 decoding="async"
 onclick="openLightbox(this)"
@@ -275,9 +289,9 @@ alt="{title}">
 </sl-card>
 </div>
 """
-        gallery_html += "</div></section>"
+        gallery_html+="</div></section>"
 
-    gallery_html += f"""
+    gallery_html+=f"""
 <footer class="text-start p-3" style="color:#666;">
 &copy; 2026 Waza Photography
 </footer>
@@ -303,14 +317,16 @@ class Watcher(FileSystemEventHandler):
 
 generate_website()
 
-observer = Observer()
-observer.schedule(Watcher(), path=paths["main"], recursive=True)
+observer=Observer()
+observer.schedule(Watcher(),path=paths["main"],recursive=True)
 observer.start()
 
 print("Watching for changes")
+
 try:
     while True:
         time.sleep(1)
 except KeyboardInterrupt:
     observer.stop()
+
 observer.join()

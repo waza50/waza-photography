@@ -34,14 +34,27 @@ object-fit:cover;
 }
 .hero-text{
 position:absolute;
+top:50%;
 left:50%;
-transform:translateX(-50%);
+transform:translate(-50%,-50%);
 color:white;
 background:rgba(0,0,0,.45);
-padding:10px 20px;
+padding:25px;
 border-radius:6px;
 text-align:center;
-bottom:20px;
+}
+.hero-text a.banner-text{
+display:inline-block;
+margin-top:15px;
+font-size:1.25rem;
+color:white;
+text-decoration:none;
+background:rgba(0,0,0,0.45);
+padding:10px 20px;
+border-radius:6px;
+}
+.hero-text a.banner-text:hover{
+background:rgba(0,0,0,0.6);
 }
 .lightbox{
 display:none;
@@ -119,6 +132,8 @@ updateLightbox()
 <header class="hero">
 <img src="web_images/home_file/Royal Archway.jpg" loading="eager">
 <div class="hero-text">
+<h1>Waza Photography</h1>
+<p>Discover the captivating world of Waza Photography</p>
 <a href="gallery.html" class="banner-text">Explore the Gallery</a>
 </div>
 </header>
