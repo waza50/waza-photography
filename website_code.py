@@ -220,12 +220,13 @@ def generate_website():
 <img src="{hero_image}" loading="eager">
 <div class="hero-text">
 <h1>Waza Photography</h1>
-<p>Discover the captivating world of Waza Photography</p>
+<h2>Explore the world through my lens</h2>
+<p>From vast landscapes to
+<p>Discover the captivating world of Waza Photog</p>
 </div>
 </header>
-
 <section class="container my-5">
-<h2 class="text-center mb-4">Featured Images</h2>
+<h3 class="text-center mb-4">Featured Images</h3>
 <div class="row g-3">
 """
     for img in home_images:
