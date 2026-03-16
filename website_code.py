@@ -1,6 +1,9 @@
 import os
 import json
-
+import subprocess
+import time
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 # Project directories
 base_dir = os.path.dirname(__file__)
 paths = {
@@ -8,15 +11,15 @@ paths = {
     "home": os.path.join(base_dir, "web_images", "home_file"),
     "gallery": os.path.join(base_dir, "web_images", "gallery_images"),
 }
-
 paths["themes"] = os.path.join(paths["gallery"], "gallery_themes")
+
 gallery_folders = {
     "Nature": os.path.join(paths["themes"], "nature_file"),
     "Landscape": os.path.join(paths["themes"], "landscape_file"),
     "Portraiture": os.path.join(paths["themes"], "portraiture_file")
 }
 
-# Folder existence checks
+# Folder checks
 errors = {
     paths["main"]: "Error 502",
     paths["home"]: "Error 503",
@@ -26,12 +29,10 @@ errors = {
     gallery_folders["Landscape"]: "Error 507",
     gallery_folders["Portraiture"]: "Error 508"
 }
-
 for folder, msg in errors.items():
     if not os.path.exists(folder):
         input(msg)
         exit()
-
 # Image loader
 def get_images(folder):
     return [
@@ -39,7 +40,6 @@ def get_images(folder):
         if os.path.isfile(os.path.join(folder, f))
         and f.lower().endswith((".png", ".jpg", ".jpeg", ".gif"))
     ]
-
 # Metadata
 metadata_file = os.path.join(base_dir, "image_data.json")
 if os.path.exists(metadata_file):
@@ -47,23 +47,12 @@ if os.path.exists(metadata_file):
         image_metadata = json.load(f)
 else:
     image_metadata = {}
+
 def get_meta(path):
     meta = image_metadata.get(path.replace("\\","/"), {})
-    title = meta.get(
-        "title",
-        os.path.splitext(os.path.basename(path))[0]
-    )
-
+    title = meta.get("title", os.path.splitext(os.path.basename(path))[0])
     desc = meta.get("description","")
     return title, desc
-
-# Scan images
-home_images = get_images(paths["home"])
-gallery_data = {
-    name: get_images(folder)
-    for name, folder in gallery_folders.items()
-}
-
 # Shared HTML components
 navbar = """
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -81,8 +70,6 @@ bootstrap = """
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2/dist/shoelace.js"></script>
 """
-
-# CSS for gallery images
 gallery_css = """
 <style>
 .gallery-img{
@@ -97,9 +84,11 @@ transition:0.3s;
 }
 </style>
 """
-
-# INDEX.HTML
-home_html = f"""<!DOCTYPE html>
+# Generate website function
+def generate_website():
+    # --- Home ---
+    home_images = get_images(paths["home"])
+    home_html = f"""<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
@@ -118,17 +107,21 @@ home_html = f"""<!DOCTYPE html>
 <h2 class="text-center mb-4">Featured Images</h2>
 <div class="row g-3">
 """
-
-for img in home_images:
-    img_path = f"web_images/home_file/{img}"
-    title, desc = get_meta(img_path)
-    home_html += f"""
+    for img in home_images:
+        img_path = f"web_images/home_file/{img}"
+        title, desc = get_meta(img_path)
+        home_html += f"""
     <div class="col-md-4">
+    <sl-card>
     <img src="{img_path}" class="gallery-img" alt="{title}" title="{desc}">
+    <div class="card-body">
+    <h5>{title}</h5>
+    <p>{desc}</p>
     </div>
-    """
-
-home_html += """
+    </sl-card>
+    </div>
+        """
+    home_html += """
 </div>
 </section>
 <footer class="text-center text-muted py-4 bg-light">
@@ -137,17 +130,18 @@ home_html += """
 </body>
 </html>
 """
-with open(os.path.join(base_dir,"index.html"),"w",encoding="utf-8") as f:
-    f.write(home_html)
+    with open(os.path.join(base_dir,"index.html"),"w",encoding="utf-8") as f:
+        f.write(home_html)
+ # Gallery
+    gallery_data = {name: get_images(folder) for name, folder in gallery_folders.items()}
 
-# Gallery section generator
-def generate_gallery_section(name, images, folder):
-    section = f'<section class="container my-5"><h2>{name}</h2><div class="row g-3">'
-    folder_name = folder.split(os.sep)[-1]
-    for img in images:
-        img_path = f"web_images/gallery_images/gallery_themes/{folder_name}/{img}"
-        title, desc = get_meta(img_path)
-        section += f"""
+    def generate_gallery_section(name, images, folder):
+        section = f'<section class="container my-5"><h2>{name}</h2><div class="row g-3">'
+        folder_name = folder.split(os.sep)[-1]
+        for img in images:
+            img_path = f"web_images/gallery_images/gallery_themes/{folder_name}/{img}"
+            title, desc = get_meta(img_path)
+            section += f"""
         <div class="col-md-4">
         <sl-card>
         <img src="{img_path}" class="gallery-img" alt="{title}" title="{desc}">
@@ -157,22 +151,15 @@ def generate_gallery_section(name, images, folder):
         </div>
         </sl-card>
         </div>
-        """
-    section += "</div></section>"
-    return section
+            """
+        section += "</div></section>"
+        return section
+    gallery_sections = ""
+    for name, images in gallery_data.items():
+        if images:
+            gallery_sections += generate_gallery_section(name, images, gallery_folders[name])
 
-# Build gallery sections
-gallery_sections = ""
-for name, images in gallery_data.items():
-    if images:
-        gallery_sections += generate_gallery_section(
-            name,
-            images,
-            gallery_folders[name]
-        )
-
-# GALLERY.HTML
-gallery_html = f"""<!DOCTYPE html>
+    gallery_html = f"""<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
@@ -190,11 +177,10 @@ gallery_html = f"""<!DOCTYPE html>
 </body>
 </html>
 """
-with open(os.path.join(base_dir,"gallery.html"),"w",encoding="utf-8") as f:
-    f.write(gallery_html)
-
-# ABOUT.HTML
-about_html = f"""<!DOCTYPE html>
+    with open(os.path.join(base_dir,"gallery.html"),"w",encoding="utf-8") as f:
+        f.write(gallery_html)
+#About
+    about_html = f"""<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
@@ -218,14 +204,35 @@ landscapes, and portrait photography.
 </body>
 </html>
 """
-with open(os.path.join(base_dir,"about.html"),"w",encoding="utf-8") as f:
-    f.write(about_html)
-print("Website generated successfully.")
-import subprocess
+    with open(os.path.join(base_dir,"about.html"),"w",encoding="utf-8") as f:
+        f.write(about_html)
+
+    print("Website generated successfully.")
+# Git Push
+    try:
+        subprocess.run(["git", "add", "."], check=True)
+        subprocess.run(["git", "commit", "-m", "Auto update website"], check=True)
+        subprocess.run(["git", "push"], check=True)
+        print("Changes pushed to GitHub.")
+    except:
+        print("No changes to push.")
+# Watchdog for auto-refresh
+class GalleryWatcher(FileSystemEventHandler):
+    def on_modified(self, event):
+        if event.src_path.lower().endswith((".jpg", ".jpeg", ".png", ".gif")):
+            print(f"Change detected: {event.src_path}")
+            generate_website()
+# Initial generation
+generate_website()
+# Start watching
+observer = Observer()
+observer.schedule(GalleryWatcher(), path=paths["main"], recursive=True)
+observer.start()
+print("Watching for image changes... Press Ctrl+C to stop.")
+
 try:
-    subprocess.run(["git", "add", "."], check=True)
-    subprocess.run(["git", "commit", "-m", "Auto update website"], check=True)
-    subprocess.run(["git", "push"], check=True)
-    print("Changes pushed to GitHub.")
-except:
-    print("No changes to push.")
+    while True:
+        time.sleep(1)
+except KeyboardInterrupt:
+    observer.stop()
+observer.join()
