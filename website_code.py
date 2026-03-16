@@ -197,51 +197,32 @@ with open(os.path.join(base_dir,"gallery.html"),"w",encoding="utf-8") as f:
 # ABOUT.HTML
 about_html = f"""<!DOCTYPE html>
 <html>
-
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>About</title>
-
 {bootstrap}
-
 </head>
-
 <body>
-
 {navbar}
-
 <section class="container my-5">
-
 <h2>About Waza Photography</h2>
-
 <p>
 Welcome to Waza Photography.  
 Here you will find a collection of images capturing nature,
 landscapes, and portrait photography.
 </p>
-
 </section>
-
 <footer class="text-center text-muted py-4 bg-light">
-
 <p>&copy; 2026 Warren Eyles</p>
-
 </footer>
-
 </body>
-
 </html>
 """
-
 with open(os.path.join(base_dir,"about.html"),"w",encoding="utf-8") as f:
     f.write(about_html)
-
 print("Website generated successfully.")
 import subprocess
-
 try:
     subprocess.run(["git", "add", "."], check=True)
     subprocess.run(["git", "commit", "-m", "Auto update website"], check=True)
