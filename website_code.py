@@ -12,7 +12,6 @@ paths = {
     "gallery": os.path.join(base_dir, "web_images", "gallery_images")
 }
 paths["themes"] = os.path.join(paths["gallery"], "gallery_themes")
-
 gallery_folders = {
     "Nature": os.path.join(paths["themes"], "nature_file"),
     "Landscape": os.path.join(paths["themes"], "landscape_file"),
@@ -23,12 +22,12 @@ def get_images(folder):
     return [
         f for f in os.listdir(folder)
         if os.path.isfile(os.path.join(folder, f))
-        and f.lower().endswith((".png", ".jpg", ".jpeg", ".gif", ".webp"))
+        and f.lower().endswith((".png",".jpg",".jpeg",".gif",".webp"))
     ]
 
-metadata_file = os.path.join(base_dir, "image_data.json")
+metadata_file = os.path.join(base_dir,"image_data.json")
 if os.path.exists(metadata_file):
-    with open(metadata_file, "r", encoding="utf-8") as f:
+    with open(metadata_file,"r",encoding="utf-8") as f:
         try:
             image_metadata = json.load(f)
         except:
@@ -38,9 +37,9 @@ else:
 
 def get_meta(path):
     meta = image_metadata.get(path.replace("\\","/"),{})
-    title = meta.get("title", os.path.splitext(os.path.basename(path))[0])
+    title = meta.get("title",os.path.splitext(os.path.basename(path))[0])
     desc = meta.get("description","")
-    return title, desc
+    return title,desc
 
 navbar = """
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -94,27 +93,18 @@ padding:25px;
 border-radius:6px;
 text-align:center;
 }
-.banner{
-position:relative;
-margin:40px 0;
-text-align:center;
-}
-.banner img{
-width:100%;
-height:auto;
-border-radius:6px;
-}
-.banner-text{
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%, -50%);
+.hero-text a.banner-text{
+display:inline-block;
+margin-top:15px;
+font-size:1.25rem;
 color:white;
-font-size:2rem;
-background:rgba(0,0,0,.45);
-padding:15px 25px;
-border-radius:6px;
 text-decoration:none;
+background:rgba(0,0,0,0.45);
+padding:10px 20px;
+border-radius:6px;
+}
+.hero-text a.banner-text:hover{
+background:rgba(0,0,0,0.6);
 }
 .lightbox{
 display:none;
@@ -186,19 +176,19 @@ lightbox_html = """
 """
 
 def generate_website():
-    all_folders = [paths["home"]] + list(gallery_folders.values())
+    all_folders=[paths["home"]]+list(gallery_folders.values())
     for folder in all_folders:
         for img in get_images(folder):
-            img_path = os.path.join(folder, img).replace("\\","/")
+            img_path=os.path.join(folder,img).replace("\\","/")
             if img_path not in image_metadata:
-                image_metadata[img_path] = {"title":"","description":""}
-    with open(metadata_file, "w", encoding="utf-8") as f:
-        json.dump(image_metadata, f, indent=4)
+                image_metadata[img_path]={"title":"","description":""}
+    with open(metadata_file,"w",encoding="utf-8") as f:
+        json.dump(image_metadata,f,indent=4)
 
     # Home page
-    home_images = get_images(paths["home"])
-    hero_image = f"web_images/home_file/Royal Archway.jpg"
-    home_html = f"""
+    home_images=get_images(paths["home"])
+    hero_image="web_images/home_file/Royal Archway.jpg"  # <-- Set the hero image
+    home_html=f"""
 <!DOCTYPE html>
 <html>
 <head>
@@ -216,16 +206,18 @@ def generate_website():
 <div class="hero-text">
 <h1>Waza Photography</h1>
 <p>Discover the captivating world of Waza Photography</p>
+<a href="gallery.html" class="banner-text">Explore the Gallery</a>
 </div>
 </header>
 <section class="container my-5">
 <h2 class="text-center mb-4">Featured Images</h2>
 <div class="row g-3">
 """
+
     for img in home_images:
-        img_path = f"web_images/home_file/{img}"
-        title, desc = get_meta(img_path)
-        home_html += f"""
+        img_path=f"web_images/home_file/{img}"
+        title,desc=get_meta(img_path)
+        home_html+=f"""
 <div class="col-md-4">
 <sl-card>
 <img src="{img_path}" class="gallery-img"
@@ -240,13 +232,9 @@ alt="{title}">
 </sl-card>
 </div>
 """
-    # Banner with clickable "Explore the Gallery"
-    home_html += f"""
+
+    home_html+=f"""
 </div>
-</section>
-<section class="banner">
-<img src="web_images/home_file/Royal Archway.jpg">
-<a href="gallery.html" class="banner-text">Explore the Gallery</a>
 </section>
 <footer class="text-center text-muted py-4 bg-light">
 <p>&copy; 2026 Warren Eyles</p>
@@ -255,11 +243,11 @@ alt="{title}">
 </body>
 </html>
 """
-    with open(os.path.join(base_dir, "index.html"), "w", encoding="utf-8") as f:
+    with open(os.path.join(base_dir,"index.html"),"w",encoding="utf-8") as f:
         f.write(home_html)
 
     # Gallery page
-    gallery_html = f"""
+    gallery_html=f"""
 <!DOCTYPE html>
 <html>
 <head>
@@ -273,18 +261,19 @@ alt="{title}">
 <body>
 {navbar}
 """
-    for name, folder in gallery_folders.items():
-        images = get_images(folder)
-        gallery_html += f"""
+
+    for name,folder in gallery_folders.items():
+        images=get_images(folder)
+        gallery_html+=f"""
 <section class="container my-5">
 <h2>{name}</h2>
 <div class="row g-3">
 """
-        folder_name = folder.split(os.sep)[-1]
+        folder_name=folder.split(os.sep)[-1]
         for img in images:
-            img_path = f"web_images/gallery_images/gallery_themes/{folder_name}/{img}"
-            title, desc = get_meta(img_path)
-            gallery_html += f"""
+            img_path=f"web_images/gallery_images/gallery_themes/{folder_name}/{img}"
+            title,desc=get_meta(img_path)
+            gallery_html+=f"""
 <div class="col-md-4">
 <sl-card>
 <img src="{img_path}"
@@ -300,9 +289,9 @@ alt="{title}">
 </sl-card>
 </div>
 """
-        gallery_html += "</div></section>"
+        gallery_html+="</div></section>"
 
-    gallery_html += f"""
+    gallery_html+=f"""
 <footer class="text-start p-3" style="color:#666;">
 &copy; 2026 Waza Photography
 </footer>
@@ -310,30 +299,34 @@ alt="{title}">
 </body>
 </html>
 """
-    with open(os.path.join(base_dir, "gallery.html"), "w", encoding="utf-8") as f:
+    with open(os.path.join(base_dir,"gallery.html"),"w",encoding="utf-8") as f:
         f.write(gallery_html)
 
+    # Git push
     try:
-        subprocess.run(["git","add","."], check=True)
-        subprocess.run(["git","commit","-m","Auto update website"], check=True)
-        subprocess.run(["git","push"], check=True)
+        subprocess.run(["git","add","."],check=True)
+        subprocess.run(["git","commit","-m","Auto update website"],check=True)
+        subprocess.run(["git","push"],check=True)
     except:
         pass
 
 class Watcher(FileSystemEventHandler):
-    def on_modified(self, event):
+    def on_modified(self,event):
         if event.src_path.lower().endswith((".jpg",".jpeg",".png",".gif",".webp")):
             generate_website()
 
 generate_website()
-observer = Observer()
-observer.schedule(Watcher(), path=paths["main"], recursive=True)
+
+observer=Observer()
+observer.schedule(Watcher(),path=paths["main"],recursive=True)
 observer.start()
 
-print("Watching for changes...")
+print("Watching for changes")
+
 try:
     while True:
         time.sleep(1)
 except KeyboardInterrupt:
     observer.stop()
+
 observer.join()
