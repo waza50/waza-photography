@@ -12,13 +12,11 @@ paths = {
     "gallery": os.path.join(base_dir, "web_images", "gallery_images"),
 }
 paths["themes"] = os.path.join(paths["gallery"], "gallery_themes")
-
 gallery_folders = {
     "Nature": os.path.join(paths["themes"], "nature_file"),
     "Landscape": os.path.join(paths["themes"], "landscape_file"),
     "Portraiture": os.path.join(paths["themes"], "portraiture_file")
 }
-
 # Folder checks
 errors = {
     paths["main"]: "Error 502",
@@ -33,7 +31,7 @@ for folder, msg in errors.items():
     if not os.path.exists(folder):
         input(msg)
         exit()
-# Image loader
+# Image loader-
 def get_images(folder):
     return [
         f for f in os.listdir(folder)
@@ -77,12 +75,34 @@ width:100%;
 height:300px;
 object-fit:cover;
 border-radius:6px;
+cursor:pointer;
 }
 .gallery-img:hover{
 transform:scale(1.05);
 transition:0.3s;
 }
 </style>
+"""
+# Lightbox modal HTML & JS
+lightbox_modal = """
+<!-- Lightbox Modal -->
+<div id="lightboxModal" class="modal fade" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-transparent border-0">
+      <span class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal"></span>
+      <img id="lightboxImage" src="" class="img-fluid rounded">
+    </div>
+  </div>
+</div>
+
+<script>
+function openLightbox(img) {
+    var lightboxImage = document.getElementById('lightboxImage');
+    lightboxImage.src = img.src;
+    var modal = new bootstrap.Modal(document.getElementById('lightboxModal'));
+    modal.show();
+}
+</script>
 """
 # Generate website function
 def generate_website():
@@ -113,7 +133,7 @@ def generate_website():
         home_html += f"""
     <div class="col-md-4">
     <sl-card>
-    <img src="{img_path}" class="gallery-img" alt="{title}" title="{desc}">
+    <img src="{img_path}" class="gallery-img" alt="{title}" title="{desc}" onclick="openLightbox(this)">
     <div class="card-body">
     <h5>{title}</h5>
     <p>{desc}</p>
@@ -127,12 +147,13 @@ def generate_website():
 <footer class="text-center text-muted py-4 bg-light">
 <p>&copy; 2026 Warren Eyles</p>
 </footer>
-</body>
-</html>
 """
+    home_html += lightbox_modal
+    home_html += "</body></html>"
     with open(os.path.join(base_dir,"index.html"),"w",encoding="utf-8") as f:
         f.write(home_html)
- # Gallery
+
+    # --- Gallery ---
     gallery_data = {name: get_images(folder) for name, folder in gallery_folders.items()}
 
     def generate_gallery_section(name, images, folder):
@@ -144,7 +165,7 @@ def generate_website():
             section += f"""
         <div class="col-md-4">
         <sl-card>
-        <img src="{img_path}" class="gallery-img" alt="{title}" title="{desc}">
+        <img src="{img_path}" class="gallery-img" alt="{title}" title="{desc}" onclick="openLightbox(this)">
         <div class="card-body">
         <h5>{title}</h5>
         <p>{desc}</p>
@@ -174,12 +195,12 @@ def generate_website():
 <footer class="text-start p-3" style="color:#666;">
 &copy; 2026 Waza Photography
 </footer>
-</body>
-</html>
 """
+    gallery_html += lightbox_modal
+    gallery_html += "</body></html>"
     with open(os.path.join(base_dir,"gallery.html"),"w",encoding="utf-8") as f:
         f.write(gallery_html)
-#About
+    # --- About ---
     about_html = f"""<!DOCTYPE html>
 <html>
 <head>
@@ -206,9 +227,8 @@ landscapes, and portrait photography.
 """
     with open(os.path.join(base_dir,"about.html"),"w",encoding="utf-8") as f:
         f.write(about_html)
-
     print("Website generated successfully.")
-# Git Push
+    # --- Git Push ---
     try:
         subprocess.run(["git", "add", "."], check=True)
         subprocess.run(["git", "commit", "-m", "Auto update website"], check=True)
