@@ -77,24 +77,29 @@ padding:10px;
 <script>
 let galleryImages=[]
 let currentIndex=0
+
 function openLightbox(el){
 galleryImages=[...document.querySelectorAll('.gallery-img')]
 currentIndex=galleryImages.indexOf(el)
 updateLightbox()
 document.getElementById('lightbox').style.display='flex'
 }
+
 function closeLightbox(){
 document.getElementById('lightbox').style.display='none'
 }
+
 function updateLightbox(){
 const img=document.getElementById('lightbox-img')
 img.src=galleryImages[currentIndex].src
 }
+
 function prevImage(e){
 e.stopPropagation()
 currentIndex=(currentIndex-1+galleryImages.length)%galleryImages.length
 updateLightbox()
 }
+
 function nextImage(e){
 e.stopPropagation()
 currentIndex=(currentIndex+1)%galleryImages.length
@@ -104,6 +109,7 @@ updateLightbox()
 
 </head>
 <body>
+
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 <div class="container-fluid">
@@ -313,11 +319,13 @@ alt="_MG_9486">
 &copy; 2026 Waza Photography
 </footer>
 
+
 <div id="lightbox" class="lightbox" onclick="closeLightbox()">
 <span class="arrow left" onclick="prevImage(event)">&#10094;</span>
 <img id="lightbox-img">
 <span class="arrow right" onclick="nextImage(event)">&#10095;</span>
 </div>
+
 
 </body>
 </html>
