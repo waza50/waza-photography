@@ -77,24 +77,30 @@ padding:10px;
 <script>
 let galleryImages=[]
 let currentIndex=0
+
 function openLightbox(el){
 galleryImages=[...document.querySelectorAll('.gallery-img')]
 currentIndex=galleryImages.indexOf(el)
 updateLightbox()
 document.getElementById('lightbox').style.display='flex'
 }
+
 function closeLightbox(){
 document.getElementById('lightbox').style.display='none'
 }
+
 function updateLightbox(){
 const img=document.getElementById('lightbox-img')
 img.src=galleryImages[currentIndex].src
+img.loading="eager"
 }
+
 function prevImage(e){
 e.stopPropagation()
 currentIndex=(currentIndex-1+galleryImages.length)%galleryImages.length
 updateLightbox()
 }
+
 function nextImage(e){
 e.stopPropagation()
 currentIndex=(currentIndex+1)%galleryImages.length
@@ -117,7 +123,7 @@ updateLightbox()
 </nav>
 
 <header class="hero">
-<img src="web_images/home_file/Modern Building With Chimneys.jpg" loading="eager">
+<img src="c:/xampp/htdocs/wazaphotography.com/web_images/optimized/Modern Building With Chimneys.jpg" loading="eager">
 <div class="hero-text">
 <h1>Waza Photography</h1>
 <p>Discover the captivating world of Waza Photography</p>
@@ -129,14 +135,13 @@ updateLightbox()
 
 <div class="col-md-4">
 <sl-card>
-<img src="web_images/home_file/Modern Building With Chimneys.jpg" class="gallery-img"
+<img src="c:/xampp/htdocs/wazaphotography.com/web_images/optimized/Modern Building With Chimneys.jpg" class="gallery-img"
 loading="lazy"
 decoding="async"
 onclick="openLightbox(this)"
-alt="Modern Building With Chimneys">
-
+alt="">
 <div class="card-body">
-<h5>Modern Building With Chimneys</h5>
+<h5></h5>
 <p></p>
 </div>
 </sl-card>
@@ -144,14 +149,13 @@ alt="Modern Building With Chimneys">
 
 <div class="col-md-4">
 <sl-card>
-<img src="web_images/home_file/Royal Archway.jpg" class="gallery-img"
+<img src="c:/xampp/htdocs/wazaphotography.com/web_images/optimized/Royal Archway.jpg" class="gallery-img"
 loading="lazy"
 decoding="async"
 onclick="openLightbox(this)"
-alt="Royal Archway">
-
+alt="">
 <div class="card-body">
-<h5>Royal Archway</h5>
+<h5></h5>
 <p></p>
 </div>
 </sl-card>
@@ -159,14 +163,13 @@ alt="Royal Archway">
 
 <div class="col-md-4">
 <sl-card>
-<img src="web_images/home_file/scanner flowers 1-9.jpg" class="gallery-img"
+<img src="c:/xampp/htdocs/wazaphotography.com/web_images/optimized/scanner flowers 1-9.jpg" class="gallery-img"
 loading="lazy"
 decoding="async"
 onclick="openLightbox(this)"
-alt="scanner flowers 1-9">
-
+alt="">
 <div class="card-body">
-<h5>scanner flowers 1-9</h5>
+<h5></h5>
 <p></p>
 </div>
 </sl-card>
@@ -174,14 +177,13 @@ alt="scanner flowers 1-9">
 
 <div class="col-md-4">
 <sl-card>
-<img src="web_images/home_file/Stormy Countryside.jpg" class="gallery-img"
+<img src="c:/xampp/htdocs/wazaphotography.com/web_images/optimized/Stormy Countryside.jpg" class="gallery-img"
 loading="lazy"
 decoding="async"
 onclick="openLightbox(this)"
-alt="Stormy Countryside">
-
+alt="">
 <div class="card-body">
-<h5>Stormy Countryside</h5>
+<h5></h5>
 <p></p>
 </div>
 </sl-card>
@@ -189,14 +191,13 @@ alt="Stormy Countryside">
 
 <div class="col-md-4">
 <sl-card>
-<img src="web_images/home_file/Waza012.jpg" class="gallery-img"
+<img src="c:/xampp/htdocs/wazaphotography.com/web_images/optimized/Waza012.jpg" class="gallery-img"
 loading="lazy"
 decoding="async"
 onclick="openLightbox(this)"
-alt="Waza012">
-
+alt="">
 <div class="card-body">
-<h5>Waza012</h5>
+<h5></h5>
 <p></p>
 </div>
 </sl-card>
@@ -204,14 +205,13 @@ alt="Waza012">
 
 <div class="col-md-4">
 <sl-card>
-<img src="web_images/home_file/Waza035.jpg" class="gallery-img"
+<img src="c:/xampp/htdocs/wazaphotography.com/web_images/optimized/Waza035.jpg" class="gallery-img"
 loading="lazy"
 decoding="async"
 onclick="openLightbox(this)"
-alt="Waza035">
-
+alt="">
 <div class="card-body">
-<h5>Waza035</h5>
+<h5></h5>
 <p></p>
 </div>
 </sl-card>
