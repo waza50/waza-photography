@@ -221,7 +221,7 @@ def generate_website():
 <div class="hero-text">
 <h1>Waza Photography</h1>
 <h2>Explore the world through my lens</h2>
-<p>Discover the captivating world of Waza Photog</p>
+<p>Discover the captivating world of Waza Photography</p>
 </div>
 </header>
 <section class="container my-5">
