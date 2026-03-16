@@ -109,7 +109,6 @@ home_html = f"""<!DOCTYPE html>
 {gallery_css}
 </head>
 <body>
-
 {navbar}
 <header class="text-center text-white bg-dark py-5">
 <h1>Waza Photography</h1>
