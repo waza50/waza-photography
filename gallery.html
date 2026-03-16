@@ -36,14 +36,40 @@ max-width:90%;
 max-height:90%;
 border-radius:6px;
 }
+.arrow {
+position:absolute;
+top:50%;
+font-size:3rem;
+color:white;
+cursor:pointer;
+user-select:none;
+z-index:10000;
+padding:0 10px;
+}
+.arrow.left { left:10px; }
+.arrow.right { right:10px; }
 </style>
 <script>
+let galleryImages = [];
+let currentIndex = 0;
 function openLightbox(el){
-    const lightbox = document.getElementById('lightbox');
-    lightbox.style.display='flex';
-    lightbox.querySelector('img').src=el.src;
+    galleryImages = Array.from(document.querySelectorAll('.gallery-img'));
+    currentIndex = galleryImages.indexOf(el);
+    updateLightbox();
+    document.getElementById('lightbox').style.display='flex';
 }
 function closeLightbox(){document.getElementById('lightbox').style.display='none';}
+function updateLightbox(){document.getElementById('lightbox-img').src = galleryImages[currentIndex].src;}
+function prevImage(event){
+    event.stopPropagation();
+    currentIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
+    updateLightbox();
+}
+function nextImage(event){
+    event.stopPropagation();
+    currentIndex = (currentIndex + 1) % galleryImages.length;
+    updateLightbox();
+}
 </script>
 
 </head>
@@ -184,7 +210,9 @@ function closeLightbox(){document.getElementById('lightbox').style.display='none
 <footer class="text-start p-3" style="color:#666;">&copy; 2026 Waza Photography</footer>
 
 <div id="lightbox" class="lightbox" onclick="closeLightbox()">
-<img src="" alt="Lightbox Image">
+<span class="arrow left" onclick="prevImage(event)">&#10094;</span>
+<img id="lightbox-img" src="" alt="Lightbox Image">
+<span class="arrow right" onclick="nextImage(event)">&#10095;</span>
 </div>
 
 </body>

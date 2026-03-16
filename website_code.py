@@ -44,7 +44,10 @@ def get_images(folder):
 metadata_file = os.path.join(base_dir, "image_data.json")
 if os.path.exists(metadata_file):
     with open(metadata_file, "r", encoding="utf-8") as f:
-        image_metadata = json.load(f)
+        try:
+            image_metadata = json.load(f)
+        except json.JSONDecodeError:
+            image_metadata = {}
 else:
     image_metadata = {}
 
@@ -100,20 +103,48 @@ max-width:90%;
 max-height:90%;
 border-radius:6px;
 }
+.arrow {
+position:absolute;
+top:50%;
+font-size:3rem;
+color:white;
+cursor:pointer;
+user-select:none;
+z-index:10000;
+padding:0 10px;
+}
+.arrow.left { left:10px; }
+.arrow.right { right:10px; }
 </style>
 <script>
+let galleryImages = [];
+let currentIndex = 0;
 function openLightbox(el){
-    const lightbox = document.getElementById('lightbox');
-    lightbox.style.display='flex';
-    lightbox.querySelector('img').src=el.src;
+    galleryImages = Array.from(document.querySelectorAll('.gallery-img'));
+    currentIndex = galleryImages.indexOf(el);
+    updateLightbox();
+    document.getElementById('lightbox').style.display='flex';
 }
 function closeLightbox(){document.getElementById('lightbox').style.display='none';}
+function updateLightbox(){document.getElementById('lightbox-img').src = galleryImages[currentIndex].src;}
+function prevImage(event){
+    event.stopPropagation();
+    currentIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
+    updateLightbox();
+}
+function nextImage(event){
+    event.stopPropagation();
+    currentIndex = (currentIndex + 1) % galleryImages.length;
+    updateLightbox();
+}
 </script>
 """
 
 lightbox_modal = """
 <div id="lightbox" class="lightbox" onclick="closeLightbox()">
-<img src="" alt="Lightbox Image">
+<span class="arrow left" onclick="prevImage(event)">&#10094;</span>
+<img id="lightbox-img" src="" alt="Lightbox Image">
+<span class="arrow right" onclick="nextImage(event)">&#10095;</span>
 </div>
 """
 
@@ -121,11 +152,11 @@ def generate_website():
     all_folders = [paths["home"]] + list(gallery_folders.values())
     for folder in all_folders:
         for img in get_images(folder):
-            img_path = os.path.join(folder, img).replace("\\", "/")
+            img_path = os.path.join(folder, img).replace("\\","/")
             if img_path not in image_metadata:
-                image_metadata[img_path] = {"title": "", "description": ""}
-    with open(metadata_file, "w", encoding="utf-8") as f:
-        json.dump(image_metadata, f, indent=4)
+                image_metadata[img_path] = {"title":"","description":""}
+    with open(metadata_file,"w",encoding="utf-8") as f:
+        json.dump(image_metadata,f,indent=4)
 
     home_images = get_images(paths["home"])
     home_html = f"""<!DOCTYPE html>
@@ -164,7 +195,6 @@ def generate_website():
     home_html += "</div></section><footer class='text-center text-muted py-4 bg-light'><p>&copy; 2026 Warren Eyles</p></footer>"
     home_html += lightbox_modal
     home_html += "</body></html>"
-
     with open(os.path.join(base_dir,"index.html"),"w",encoding="utf-8") as f:
         f.write(home_html)
 
@@ -211,7 +241,6 @@ def generate_website():
 {lightbox_modal}
 </body>
 </html>"""
-
     with open(os.path.join(base_dir,"gallery.html"),"w",encoding="utf-8") as f:
         f.write(gallery_html)
 
@@ -234,30 +263,27 @@ def generate_website():
 </footer>
 </body>
 </html>"""
-
     with open(os.path.join(base_dir,"about.html"),"w",encoding="utf-8") as f:
         f.write(about_html)
 
     try:
-        subprocess.run(["git","add","."], check=True)
-        subprocess.run(["git","commit","-m","Auto update website"], check=True)
-        subprocess.run(["git","push"], check=True)
+        subprocess.run(["git","add","."],check=True)
+        subprocess.run(["git","commit","-m","Auto update website"],check=True)
+        subprocess.run(["git","push"],check=True)
     except:
         print("No changes to push.")
 
 class GalleryWatcher(FileSystemEventHandler):
-    def on_modified(self, event):
+    def on_modified(self,event):
         if event.src_path.lower().endswith((".jpg",".jpeg",".png",".gif")):
             print(f"Change detected: {event.src_path}")
             generate_website()
 
 generate_website()
-
 observer = Observer()
 observer.schedule(GalleryWatcher(), path=paths["main"], recursive=True)
 observer.start()
 print("Watching for image changes... Press Ctrl+C to stop.")
-
 try:
     while True:
         time.sleep(1)
