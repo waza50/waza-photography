@@ -4,6 +4,18 @@ import subprocess
 import time
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
+from PIL import Image
+def optimize_image(input_path, output_path):
+    with Image.open(input_path) as img:
+
+        max_width = 2048
+
+        if img.width > max_width:
+            ratio = max_width / img.width
+            new_height = int(img.height * ratio)
+            img = img.resize((max_width, new_height))
+
+        img.save(output_path, "jpg", quality=80, optimize=True)
 base_dir = os.path.dirname(__file__)
 paths = {
     "main": os.path.join(base_dir, "web_images"),
