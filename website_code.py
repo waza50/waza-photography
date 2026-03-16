@@ -6,7 +6,6 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
 base_dir = os.path.dirname(__file__)
-
 paths = {
     "main": os.path.join(base_dir, "web_images"),
     "home": os.path.join(base_dir, "web_images", "home_file"),
@@ -20,6 +19,13 @@ gallery_folders = {
     "Portraiture": os.path.join(paths["themes"], "portraiture_file")
 }
 
+def get_images(folder):
+    return [
+        f for f in os.listdir(folder)
+        if os.path.isfile(os.path.join(folder, f))
+        and f.lower().endswith((".png", ".jpg", ".jpeg", ".gif", ".webp"))
+    ]
+
 metadata_file = os.path.join(base_dir, "image_data.json")
 if os.path.exists(metadata_file):
     with open(metadata_file, "r", encoding="utf-8") as f:
@@ -30,16 +36,9 @@ if os.path.exists(metadata_file):
 else:
     image_metadata = {}
 
-def get_images(folder):
-    return [
-        f for f in os.listdir(folder)
-        if os.path.isfile(os.path.join(folder, f))
-        and f.lower().endswith((".png",".jpg",".jpeg",".gif",".webp"))
-    ]
-
 def get_meta(path):
     meta = image_metadata.get(path.replace("\\","/"),{})
-    title = meta.get("title",os.path.splitext(os.path.basename(path))[0])
+    title = meta.get("title", os.path.splitext(os.path.basename(path))[0])
     desc = meta.get("description","")
     return title, desc
 
@@ -97,28 +96,25 @@ text-align:center;
 }
 .banner{
 position:relative;
-height:40vh;
-margin:50px 0;
-overflow:hidden;
-border-radius:6px;
+margin:40px 0;
+text-align:center;
 }
 .banner img{
 width:100%;
-height:100%;
-object-fit:cover;
-opacity:0.8;
+height:auto;
+border-radius:6px;
 }
 .banner-text{
 position:absolute;
 top:50%;
 left:50%;
-transform:translate(-50%,-50%);
+transform:translate(-50%, -50%);
 color:white;
 font-size:2rem;
-text-align:center;
-background:rgba(0,0,0,0.45);
-padding:15px;
+background:rgba(0,0,0,.45);
+padding:15px 25px;
 border-radius:6px;
+text-decoration:none;
 }
 .lightbox{
 display:none;
@@ -190,20 +186,19 @@ lightbox_html = """
 """
 
 def generate_website():
-    # Ensure metadata entries for all images
     all_folders = [paths["home"]] + list(gallery_folders.values())
     for folder in all_folders:
         for img in get_images(folder):
-            img_path = os.path.join(folder,img).replace("\\","/")
+            img_path = os.path.join(folder, img).replace("\\","/")
             if img_path not in image_metadata:
-                image_metadata[img_path]={"title":"","description":""}
-    with open(metadata_file,"w",encoding="utf-8") as f:
-        json.dump(image_metadata,f,indent=4)
+                image_metadata[img_path] = {"title":"","description":""}
+    with open(metadata_file, "w", encoding="utf-8") as f:
+        json.dump(image_metadata, f, indent=4)
 
-    # --- Home Page ---
+    # Home page
     home_images = get_images(paths["home"])
-    hero_image = "web_images/home_file/Royal Archway.jpg" # changed hero
-    home_html=f"""
+    hero_image = f"web_images/home_file/Royal Archway.jpg"
+    home_html = f"""
 <!DOCTYPE html>
 <html>
 <head>
@@ -223,7 +218,6 @@ def generate_website():
 <p>Discover the captivating world of Waza Photography</p>
 </div>
 </header>
-
 <section class="container my-5">
 <h2 class="text-center mb-4">Featured Images</h2>
 <div class="row g-3">
@@ -246,14 +240,13 @@ alt="{title}">
 </sl-card>
 </div>
 """
-
-    # Banner section below featured images
-    home_html += """
+    # Banner with clickable "Explore the Gallery"
+    home_html += f"""
 </div>
 </section>
 <section class="banner">
 <img src="web_images/home_file/Royal Archway.jpg">
-<div class="banner-text">Explore the Gallery</div>
+<a href="gallery.html" class="banner-text">Explore the Gallery</a>
 </section>
 <footer class="text-center text-muted py-4 bg-light">
 <p>&copy; 2026 Warren Eyles</p>
@@ -261,13 +254,12 @@ alt="{title}">
 {lightbox_html}
 </body>
 </html>
-""".replace("{lightbox_html}", lightbox_html)
-
-    with open(os.path.join(base_dir,"index.html"),"w",encoding="utf-8") as f:
+"""
+    with open(os.path.join(base_dir, "index.html"), "w", encoding="utf-8") as f:
         f.write(home_html)
 
-    # --- Gallery Page ---
-    gallery_html=f"""
+    # Gallery page
+    gallery_html = f"""
 <!DOCTYPE html>
 <html>
 <head>
@@ -295,7 +287,8 @@ alt="{title}">
             gallery_html += f"""
 <div class="col-md-4">
 <sl-card>
-<img src="{img_path}" class="gallery-img"
+<img src="{img_path}"
+class="gallery-img"
 loading="lazy"
 decoding="async"
 onclick="openLightbox(this)"
@@ -316,22 +309,19 @@ alt="{title}">
 {lightbox_html}
 </body>
 </html>
-""".replace("{lightbox_html}", lightbox_html)
-
-    with open(os.path.join(base_dir,"gallery.html"),"w",encoding="utf-8") as f:
+"""
+    with open(os.path.join(base_dir, "gallery.html"), "w", encoding="utf-8") as f:
         f.write(gallery_html)
 
-    # Auto push changes
     try:
-        subprocess.run(["git","add","."],check=True)
-        subprocess.run(["git","commit","-m","Auto update website"],check=True)
-        subprocess.run(["git","push"],check=True)
+        subprocess.run(["git","add","."], check=True)
+        subprocess.run(["git","commit","-m","Auto update website"], check=True)
+        subprocess.run(["git","push"], check=True)
     except:
         pass
 
-# Watchdog
 class Watcher(FileSystemEventHandler):
-    def on_modified(self,event):
+    def on_modified(self, event):
         if event.src_path.lower().endswith((".jpg",".jpeg",".png",".gif",".webp")):
             generate_website()
 
@@ -339,7 +329,8 @@ generate_website()
 observer = Observer()
 observer.schedule(Watcher(), path=paths["main"], recursive=True)
 observer.start()
-print("Watching for changes")
+
+print("Watching for changes...")
 try:
     while True:
         time.sleep(1)
