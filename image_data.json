@@ -1,11 +1,82 @@
 {
-  "home_file/DSC_9323.jpg": {
-    "title": "Forest Path",
-    "description": "A misty path through woodland in early morning light"
-  },
-  "gallery_images/gallery_themes/Nature_file/DSC_9323 (2).jpg": {
-    "title": "Sunset Lake",
-    "description": "Golden sunset reflecting across the lake"
-  }
+    "home_file/DSC_9323.jpg": {
+        "title": "Forest Path",
+        "description": "A misty path through woodland in early morning light"
+    },
+    "gallery_images/gallery_themes/Nature_file/DSC_9323 (2).jpg": {
+        "title": "Sunset Lake",
+        "description": "Golden sunset reflecting across the lake"
+    },
+    "c:/xampp/htdocs/wazaphotography.com/web_images/home_file/Modern Building With Chimneys.jpg": {
+        "title": "",
+        "description": ""
+    },
+    "c:/xampp/htdocs/wazaphotography.com/web_images/home_file/Royal Archway.jpg": {
+        "title": "",
+        "description": ""
+    },
+    "c:/xampp/htdocs/wazaphotography.com/web_images/home_file/scanner flowers 1-9.jpg": {
+        "title": "",
+        "description": ""
+    },
+    "c:/xampp/htdocs/wazaphotography.com/web_images/home_file/Stormy Countryside.jpg": {
+        "title": "",
+        "description": ""
+    },
+    "c:/xampp/htdocs/wazaphotography.com/web_images/home_file/Waza012.jpg": {
+        "title": "",
+        "description": ""
+    },
+    "c:/xampp/htdocs/wazaphotography.com/web_images/home_file/Waza035.jpg": {
+        "title": "",
+        "description": ""
+    },
+    "c:/xampp/htdocs/wazaphotography.com/web_images/gallery_images/gallery_themes/nature_file/scanner flowers 1-9.jpg": {
+        "title": "",
+        "description": ""
+    },
+    "c:/xampp/htdocs/wazaphotography.com/web_images/gallery_images/gallery_themes/nature_file/Waza012.jpg": {
+        "title": "",
+        "description": ""
+    },
+    "c:/xampp/htdocs/wazaphotography.com/web_images/gallery_images/gallery_themes/nature_file/Waza013.jpg": {
+        "title": "",
+        "description": ""
+    },
+    "c:/xampp/htdocs/wazaphotography.com/web_images/gallery_images/gallery_themes/nature_file/Waza014.jpg": {
+        "title": "",
+        "description": ""
+    },
+    "c:/xampp/htdocs/wazaphotography.com/web_images/gallery_images/gallery_themes/nature_file/Waza017.jpg": {
+        "title": "",
+        "description": ""
+    },
+    "c:/xampp/htdocs/wazaphotography.com/web_images/gallery_images/gallery_themes/nature_file/Waza035.jpg": {
+        "title": "",
+        "description": ""
+    },
+    "c:/xampp/htdocs/wazaphotography.com/web_images/gallery_images/gallery_themes/landscape_file/formby jaz golden.jpg": {
+        "title": "",
+        "description": ""
+    },
+    "c:/xampp/htdocs/wazaphotography.com/web_images/gallery_images/gallery_themes/landscape_file/Modern Building With Chimneys.jpg": {
+        "title": "",
+        "description": ""
+    },
+    "c:/xampp/htdocs/wazaphotography.com/web_images/gallery_images/gallery_themes/landscape_file/Royal Archway.jpg": {
+        "title": "",
+        "description": ""
+    },
+    "c:/xampp/htdocs/wazaphotography.com/web_images/gallery_images/gallery_themes/landscape_file/Stormy Countryside.jpg": {
+        "title": "",
+        "description": ""
+    },
+    "c:/xampp/htdocs/wazaphotography.com/web_images/gallery_images/gallery_themes/landscape_file/_MG_1126.jpg": {
+        "title": "",
+        "description": ""
+    },
+    "c:/xampp/htdocs/wazaphotography.com/web_images/gallery_images/gallery_themes/landscape_file/_MG_9486.jpg": {
+        "title": "",
+        "description": ""
+    }
 }
-

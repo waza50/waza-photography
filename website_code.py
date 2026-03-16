@@ -4,20 +4,21 @@ import subprocess
 import time
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-# Project directories
+
 base_dir = os.path.dirname(__file__)
 paths = {
     "main": os.path.join(base_dir, "web_images"),
     "home": os.path.join(base_dir, "web_images", "home_file"),
-    "gallery": os.path.join(base_dir, "web_images", "gallery_images"),
+    "gallery": os.path.join(base_dir, "web_images", "gallery_images")
 }
 paths["themes"] = os.path.join(paths["gallery"], "gallery_themes")
+
 gallery_folders = {
     "Nature": os.path.join(paths["themes"], "nature_file"),
     "Landscape": os.path.join(paths["themes"], "landscape_file"),
     "Portraiture": os.path.join(paths["themes"], "portraiture_file")
 }
-# Folder checks
+
 errors = {
     paths["main"]: "Error 502",
     paths["home"]: "Error 503",
@@ -27,18 +28,19 @@ errors = {
     gallery_folders["Landscape"]: "Error 507",
     gallery_folders["Portraiture"]: "Error 508"
 }
+
 for folder, msg in errors.items():
     if not os.path.exists(folder):
         input(msg)
         exit()
-# Image loader-
+
 def get_images(folder):
     return [
         f for f in os.listdir(folder)
         if os.path.isfile(os.path.join(folder, f))
         and f.lower().endswith((".png", ".jpg", ".jpeg", ".gif"))
     ]
-# Metadata
+
 metadata_file = os.path.join(base_dir, "image_data.json")
 if os.path.exists(metadata_file):
     with open(metadata_file, "r", encoding="utf-8") as f:
@@ -51,7 +53,7 @@ def get_meta(path):
     title = meta.get("title", os.path.splitext(os.path.basename(path))[0])
     desc = meta.get("description","")
     return title, desc
-# Shared HTML components
+
 navbar = """
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 <div class="container-fluid">
@@ -64,10 +66,12 @@ navbar = """
 </div>
 </nav>
 """
+
 bootstrap = """
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2/dist/shoelace.js"></script>
 """
+
 gallery_css = """
 <style>
 .gallery-img{
@@ -81,32 +85,48 @@ cursor:pointer;
 transform:scale(1.05);
 transition:0.3s;
 }
-</style>
-"""
-# Lightbox modal HTML & JS
-lightbox_modal = """
-<!-- Lightbox Modal -->
-<div id="lightboxModal" class="modal fade" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content bg-transparent border-0">
-      <span class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal"></span>
-      <img id="lightboxImage" src="" class="img-fluid rounded">
-    </div>
-  </div>
-</div>
-
-<script>
-function openLightbox(img) {
-    var lightboxImage = document.getElementById('lightboxImage');
-    lightboxImage.src = img.src;
-    var modal = new bootstrap.Modal(document.getElementById('lightboxModal'));
-    modal.show();
+.lightbox {
+display:none;
+position:fixed;
+top:0;left:0;width:100%;height:100%;
+background:rgba(0,0,0,0.8);
+backdrop-filter:blur(5px);
+justify-content:center;
+align-items:center;
+z-index:9999;
 }
+.lightbox img {
+max-width:90%;
+max-height:90%;
+border-radius:6px;
+}
+</style>
+<script>
+function openLightbox(el){
+    const lightbox = document.getElementById('lightbox');
+    lightbox.style.display='flex';
+    lightbox.querySelector('img').src=el.src;
+}
+function closeLightbox(){document.getElementById('lightbox').style.display='none';}
 </script>
 """
-# Generate website function
+
+lightbox_modal = """
+<div id="lightbox" class="lightbox" onclick="closeLightbox()">
+<img src="" alt="Lightbox Image">
+</div>
+"""
+
 def generate_website():
-    # --- Home ---
+    all_folders = [paths["home"]] + list(gallery_folders.values())
+    for folder in all_folders:
+        for img in get_images(folder):
+            img_path = os.path.join(folder, img).replace("\\", "/")
+            if img_path not in image_metadata:
+                image_metadata[img_path] = {"title": "", "description": ""}
+    with open(metadata_file, "w", encoding="utf-8") as f:
+        json.dump(image_metadata, f, indent=4)
+
     home_images = get_images(paths["home"])
     home_html = f"""<!DOCTYPE html>
 <html>
@@ -141,19 +161,13 @@ def generate_website():
     </sl-card>
     </div>
         """
-    home_html += """
-</div>
-</section>
-<footer class="text-center text-muted py-4 bg-light">
-<p>&copy; 2026 Warren Eyles</p>
-</footer>
-"""
+    home_html += "</div></section><footer class='text-center text-muted py-4 bg-light'><p>&copy; 2026 Warren Eyles</p></footer>"
     home_html += lightbox_modal
     home_html += "</body></html>"
+
     with open(os.path.join(base_dir,"index.html"),"w",encoding="utf-8") as f:
         f.write(home_html)
 
-    # --- Gallery ---
     gallery_data = {name: get_images(folder) for name, folder in gallery_folders.items()}
 
     def generate_gallery_section(name, images, folder):
@@ -175,6 +189,7 @@ def generate_website():
             """
         section += "</div></section>"
         return section
+
     gallery_sections = ""
     for name, images in gallery_data.items():
         if images:
@@ -192,15 +207,14 @@ def generate_website():
 <body>
 {navbar}
 {gallery_sections}
-<footer class="text-start p-3" style="color:#666;">
-&copy; 2026 Waza Photography
-</footer>
-"""
-    gallery_html += lightbox_modal
-    gallery_html += "</body></html>"
+<footer class="text-start p-3" style="color:#666;">&copy; 2026 Waza Photography</footer>
+{lightbox_modal}
+</body>
+</html>"""
+
     with open(os.path.join(base_dir,"gallery.html"),"w",encoding="utf-8") as f:
         f.write(gallery_html)
-    # --- About ---
+
     about_html = f"""<!DOCTYPE html>
 <html>
 <head>
@@ -213,38 +227,32 @@ def generate_website():
 {navbar}
 <section class="container my-5">
 <h2>About Waza Photography</h2>
-<p>
-Welcome to Waza Photography.  
-Here you will find a collection of images capturing nature,
-landscapes, and portrait photography.
-</p>
+<p>Welcome to Waza Photography. Here you will find a collection of images capturing nature, landscapes, and portrait photography.</p>
 </section>
 <footer class="text-center text-muted py-4 bg-light">
 <p>&copy; 2026 Warren Eyles</p>
 </footer>
 </body>
-</html>
-"""
+</html>"""
+
     with open(os.path.join(base_dir,"about.html"),"w",encoding="utf-8") as f:
         f.write(about_html)
-    print("Website generated successfully.")
-    # --- Git Push ---
+
     try:
-        subprocess.run(["git", "add", "."], check=True)
-        subprocess.run(["git", "commit", "-m", "Auto update website"], check=True)
-        subprocess.run(["git", "push"], check=True)
-        print("Changes pushed to GitHub.")
+        subprocess.run(["git","add","."], check=True)
+        subprocess.run(["git","commit","-m","Auto update website"], check=True)
+        subprocess.run(["git","push"], check=True)
     except:
         print("No changes to push.")
-# Watchdog for auto-refresh
+
 class GalleryWatcher(FileSystemEventHandler):
     def on_modified(self, event):
-        if event.src_path.lower().endswith((".jpg", ".jpeg", ".png", ".gif")):
+        if event.src_path.lower().endswith((".jpg",".jpeg",".png",".gif")):
             print(f"Change detected: {event.src_path}")
             generate_website()
-# Initial generation
+
 generate_website()
-# Start watching
+
 observer = Observer()
 observer.schedule(GalleryWatcher(), path=paths["main"], recursive=True)
 observer.start()
