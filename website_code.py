@@ -15,9 +15,9 @@ paths = {
 paths["themes"] = os.path.join(paths["gallery"], "gallery_themes")
 
 gallery_folders = {
-    "Nature": os.path.join(paths["themes"], "nature_file"),
-    "Landscape": os.path.join(paths["themes"], "landscape_file"),
-    "Portraiture": os.path.join(paths["themes"], "portraiture_file")
+    "Nature_home": os.path.join(paths["themes"], "nature_home"),
+    "Landscape_home": os.path.join(paths["themes"], "landscape_home"),
+    "Portraiture_home": os.path.join(paths["themes"], "portraiture_home")
 }
 
 metadata_file = os.path.join(base_dir, "image_data.json")
