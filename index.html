@@ -11,15 +11,25 @@
 
 
 <style>
-<style>
+/* Featured images only */
+.featured-img {
+  width: 100%;
+  height: 300px;      /* All featured images same height */
+  object-fit: cover;   /* Keep aspect ratio, crop if necessary */
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+/* Other images */
 .gallery-img{
   width:100%;
-  height:300px;      /* All images same height */
-  object-fit:cover;   /* Keeps aspect ratio, crops if necessary */
+  height:auto;
+  object-fit:contain;
   border-radius:6px;
   margin-bottom:10px;
 }
-</style>
+
+/* Hero and Banner */
 .hero{
 position:relative;
 height:70vh;
@@ -98,7 +108,7 @@ border-radius:6px;
 
 <div class="col-md-4">
 <sl-card>
-<img src="web_images/home_file/Modern Building With Chimneys.jpg" class="gallery-img" loading="lazy" decoding="async" alt="Modern Building With Chimney">
+<img src="web_images/home_file/Modern Building With Chimneys.jpg" class="featured-img" loading="lazy" decoding="async" alt="Modern Building With Chimney">
 <div class="card-body">
 <h5>Modern Building With Chimney</h5>
 <p></p>
@@ -108,7 +118,7 @@ border-radius:6px;
 
 <div class="col-md-4">
 <sl-card>
-<img src="web_images/home_file/Royal Archway.jpg" class="gallery-img" loading="lazy" decoding="async" alt="Royal Archway">
+<img src="web_images/home_file/Royal Archway.jpg" class="featured-img" loading="lazy" decoding="async" alt="Royal Archway">
 <div class="card-body">
 <h5>Royal Archway</h5>
 <p></p>
@@ -118,7 +128,7 @@ border-radius:6px;
 
 <div class="col-md-4">
 <sl-card>
-<img src="web_images/home_file/scanner flowers 1-9.jpg" class="gallery-img" loading="lazy" decoding="async" alt="">
+<img src="web_images/home_file/scanner flowers 1-9.jpg" class="featured-img" loading="lazy" decoding="async" alt="">
 <div class="card-body">
 <h5></h5>
 <p></p>
@@ -128,7 +138,7 @@ border-radius:6px;
 
 <div class="col-md-4">
 <sl-card>
-<img src="web_images/home_file/Stormy Countryside.jpg" class="gallery-img" loading="lazy" decoding="async" alt="Stormy Countryside">
+<img src="web_images/home_file/Stormy Countryside.jpg" class="featured-img" loading="lazy" decoding="async" alt="Stormy Countryside">
 <div class="card-body">
 <h5>Stormy Countryside</h5>
 <p></p>
@@ -138,7 +148,7 @@ border-radius:6px;
 
 <div class="col-md-4">
 <sl-card>
-<img src="web_images/home_file/Waza012.jpg" class="gallery-img" loading="lazy" decoding="async" alt="">
+<img src="web_images/home_file/Waza012.jpg" class="featured-img" loading="lazy" decoding="async" alt="">
 <div class="card-body">
 <h5></h5>
 <p></p>
@@ -148,7 +158,7 @@ border-radius:6px;
 
 <div class="col-md-4">
 <sl-card>
-<img src="web_images/home_file/Waza035.jpg" class="gallery-img" loading="lazy" decoding="async" alt="">
+<img src="web_images/home_file/Waza035.jpg" class="featured-img" loading="lazy" decoding="async" alt="">
 <div class="card-body">
 <h5></h5>
 <p></p>

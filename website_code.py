@@ -84,15 +84,25 @@ bootstrap = """
 
 styles = """
 <style>
-<style>
+/* Featured images only */
+.featured-img {
+  width: 100%;
+  height: 300px;      /* All featured images same height */
+  object-fit: cover;   /* Keep aspect ratio, crop if necessary */
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+/* Other images */
 .gallery-img{
   width:100%;
-  height:300px;      /* All images same height */
-  object-fit:cover;   /* Keeps aspect ratio, crops if necessary */
+  height:auto;
+  object-fit:contain;
   border-radius:6px;
   margin-bottom:10px;
 }
-</style>
+
+/* Hero and Banner */
 .hero{
 position:relative;
 height:70vh;
@@ -201,7 +211,7 @@ def generate_website():
         home_html += f"""
 <div class="col-md-4">
 <sl-card>
-<img src="{rel_path}" class="gallery-img" loading="lazy" decoding="async" alt="{title}">
+<img src="{rel_path}" class="featured-img" loading="lazy" decoding="async" alt="{title}">
 <div class="card-body">
 <h5>{title}</h5>
 <p>{desc}</p>
@@ -256,6 +266,7 @@ def generate_website():
 <div class="col-md-4">
 <img src="{rel_path}" class="gallery-img">
 <h5>{title}</h5>
+<p>{desc}</p>
 </div>
 """
         html += "</div></section></body></html>"
@@ -264,7 +275,7 @@ def generate_website():
             f.write(html)
 
     # =====================================================
-    # GALLERY PAGE (updated layout)
+    # GALLERY PAGE
     # =====================================================
     gallery_html = f"""
 <!DOCTYPE html>
