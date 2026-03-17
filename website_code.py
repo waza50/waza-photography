@@ -222,9 +222,12 @@ def generate_website():
 <div class="hero-text">
 <h1>Waza Photography</h1>
 <h2>Explore the world through my lens</h2>
-<p>Discover the captivating world of Waza Photography</p>
 </div>
 </header>
+
+<section class="container my-4 text-center">
+<p> Welcome to my portfolio, here u will find a collection of images shaped by light and atmosphere. My work focuses on everyday scenes blending urban spaces and nature.</p>
+</secction>
 
 <section class="container my-5">
 <h3 class="text-center mb-4">Featured Images</h3>
