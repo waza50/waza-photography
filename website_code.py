@@ -17,7 +17,7 @@ paths = {
 }
 
 # =========================================================
-# 2. THEMES
+# 2. THEMES (added architecture)
 # =========================================================
 themes = {
     "nature": {
@@ -31,6 +31,10 @@ themes = {
     "portraiture": {
         "home": os.path.join(paths["themes"], "portraiture_home"),
         "gallery": os.path.join(paths["themes"], "portraiture_gallery")
+    },
+    "architecture": {   # New theme
+        "home": os.path.join(paths["themes"], "architecture_home"),
+        "gallery": os.path.join(paths["themes"], "architecture_gallery")
     }
 }
 
@@ -87,8 +91,8 @@ styles = """
 /* Featured images only */
 .featured-img {
   width: 100%;
-  height: 300px;      /* All featured images same height */
-  object-fit: cover;   /* Keep aspect ratio, crop if necessary */
+  height: 300px;
+  object-fit: cover;
   border-radius: 6px;
   margin-bottom: 10px;
 }
