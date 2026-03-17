@@ -5,22 +5,40 @@ import time
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
+# =========================================================
+# 1. PROJECT PATHS (edit if you move folders)
+# =========================================================
 base_dir = os.path.dirname(__file__)
 
 paths = {
     "main": os.path.join(base_dir, "web_images"),
     "home": os.path.join(base_dir, "web_images", "home_file"),
-    "gallery": os.path.join(base_dir, "web_images", "gallery_images")
-}
-paths["themes"] = os.path.join(paths["gallery"], "gallery_themes")
-
-gallery_folders = {
-    "Nature_home": os.path.join(paths["themes"], "nature_home"),
-    "Landscape_home": os.path.join(paths["themes"], "landscape_home"),
-    "Portraiture_home": os.path.join(paths["themes"], "portraiture_home")
+    "themes": os.path.join(base_dir, "web_images", "gallery_images", "gallery_themes")
 }
 
+# =========================================================
+# 2. THEMES (add/remove themes here)
+# =========================================================
+themes = {
+    "nature": {
+        "home": os.path.join(paths["themes"], "nature_home"),
+        "gallery": os.path.join(paths["themes"], "nature_gallery")
+    },
+    "landscape": {
+        "home": os.path.join(paths["themes"], "landscape_home"),
+        "gallery": os.path.join(paths["themes"], "landscape_gallery")
+    },
+    "portraiture": {
+        "home": os.path.join(paths["themes"], "portraiture_home"),
+        "gallery": os.path.join(paths["themes"], "portraiture_gallery")
+    }
+}
+
+# =========================================================
+# 3. IMAGE METADATA (titles and descriptions)
+# =========================================================
 metadata_file = os.path.join(base_dir, "image_data.json")
+
 if os.path.exists(metadata_file):
     with open(metadata_file, "r", encoding="utf-8") as f:
         try:
@@ -31,18 +49,26 @@ else:
     image_metadata = {}
 
 def get_images(folder):
+    if not os.path.exists(folder):
+        print("Missing folder:", folder)
+        return []
+
     return [
         f for f in os.listdir(folder)
         if os.path.isfile(os.path.join(folder, f))
-        and f.lower().endswith((".png",".jpg",".jpeg",".gif",".webp"))
+        and f.lower().endswith((".png", ".jpg", ".jpeg", ".webp"))
     ]
-
 def get_meta(path):
-    meta = image_metadata.get(path.replace("\\","/"),{})
-    title = meta.get("title",os.path.splitext(os.path.basename(path))[0])
-    desc = meta.get("description","")
+    meta = image_metadata.get(path.replace("\\", "/"), {})
+    title = meta.get("title", os.path.splitext(os.path.basename(path))[0])
+    desc = meta.get("description", "")
     return title, desc
 
+# =========================================================
+# 4. UI COMPONENTS 
+# =========================================================
+
+# Navbar links
 navbar = """
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 <div class="container-fluid">
@@ -56,251 +82,139 @@ navbar = """
 </nav>
 """
 
+# External libraries
 bootstrap = """
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2/dist/shoelace.js"></script>
 """
 
+# Styles
 styles = """
 <style>
 .gallery-img{
 width:100%;
-height:300px;
+height:250px;
 object-fit:cover;
 border-radius:6px;
-cursor:pointer;
 }
-.gallery-img:hover{
-transform:scale(1.05);
-transition:.3s;
-}
-.hero{
-position:relative;
-height:70vh;
-overflow:hidden;
-}
-.hero img{
-width:100%;
-height:100%;
-object-fit:cover;
-}
-.hero-text{
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-color:white;
-background:rgba(0,0,0,.45);
-padding:25px;
-border-radius:6px;
-text-align:center;
-}
-.banner{
-position:relative;
-height:40vh;
-margin:50px 0;
-overflow:hidden;
-border-radius:6px;
-}
-.banner img{
-width:100%;
-height:100%;
-object-fit:cover;
-opacity:0.8;
-}
-.banner-text{
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-color:white;
-font-size:2rem;
-text-align:center;
-background:rgba(0,0,0,0.45);
-padding:15px;
-border-radius:6px;
-}
-.lightbox{
-display:none;
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,.85);
-backdrop-filter:blur(6px);
-justify-content:center;
-align-items:center;
-z-index:9999;
-}
-.lightbox img{
-max-width:90%;
-max-height:90%;
-}
-.arrow{
-position:absolute;
-top:50%;
-font-size:3rem;
-color:white;
-cursor:pointer;
-user-select:none;
-padding:10px;
-}
-.arrow.left{left:15px;}
-.arrow.right{right:15px;}
 </style>
 """
 
-lightbox_script = """
-<script>
-let galleryImages=[]
-let currentIndex=0
-function openLightbox(el){
-galleryImages=[...document.querySelectorAll('.gallery-img')]
-currentIndex=galleryImages.indexOf(el)
-updateLightbox()
-document.getElementById('lightbox').style.display='flex'
-}
-function closeLightbox(){
-document.getElementById('lightbox').style.display='none'
-}
-function updateLightbox(){
-const img=document.getElementById('lightbox-img')
-img.src=galleryImages[currentIndex].src
-}
-function prevImage(e){
-e.stopPropagation()
-currentIndex=(currentIndex-1+galleryImages.length)%galleryImages.length
-updateLightbox()
-}
-function nextImage(e){
-e.stopPropagation()
-currentIndex=(currentIndex+1)%galleryImages.length
-updateLightbox()
-}
-</script>
-"""
-
-lightbox_html = """
-<div id="lightbox" class="lightbox" onclick="closeLightbox()">
-<span class="arrow left" onclick="prevImage(event)">&#10094;</span>
-<img id="lightbox-img">
-<span class="arrow right" onclick="nextImage(event)">&#10095;</span>
-</div>
-"""
-
+# =========================================================
+# 5. GENERATE WEBSITE
+# =========================================================
 def generate_website():
-    # Ensure metadata entries for all images
-    all_folders = [paths["home"]] + list(gallery_folders.values())
+
+    # Ensure metadata exists for all images
+    all_folders = [paths["home"]]
+    for t in themes.values():
+        all_folders.append(t["home"])
+        all_folders.append(t["gallery"])
+
     for folder in all_folders:
         for img in get_images(folder):
-            img_path = os.path.join(folder,img).replace("\\","/")
-            if img_path not in image_metadata:
-                image_metadata[img_path]={"title":"","description":""}
-    with open(metadata_file,"w",encoding="utf-8") as f:
-        json.dump(image_metadata,f,indent=4)
+            path = os.path.join(folder, img).replace("\\", "/")
+            if path not in image_metadata:
+                image_metadata[path] = {"title": "", "description": ""}
 
-    # --- Home Page ---
-    home_images = get_images(paths["home"])
-    hero_image = "web_images/home_file/Royal Archway.jpg" # changed hero
-    home_html=f"""
+    with open(metadata_file, "w", encoding="utf-8") as f:
+        json.dump(image_metadata, f, indent=4)
+
+    # =====================================================
+    # 6. HOME PAGE 
+    # =====================================================
+    home_html = f"""
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Waza Photography</title>
 {bootstrap}
 {styles}
-{lightbox_script}
 </head>
 <body>
 {navbar}
-<header class="hero">
-<img src="{hero_image}" loading="eager">
-<div class="hero-text">
-<h1>Waza Photography</h1>
-<h2>Explore the world through my lens</h2>
-<p>Discover the captivating world of Waza Photography</p>
-</div>
-</header>
+
 <section class="container my-5">
-<h3 class="text-center mb-4">Featured Images</h3>
-<div class="row g-3">
+<h2 class="text-center mb-5">Explore My Work</h2>
+
+<div class="row g-4">
 """
-    for img in home_images:
-        img_path = f"web_images/home_file/{img}"
-        title, desc = get_meta(img_path)
+
+    # Theme preview section (image + button)
+    for theme_name, data in themes.items():
+        images = get_images(data["home"])
+        if not images:
+            continue
+
+        img = images[0]
+        img_path = f"web_images/gallery_images/gallery_themes/{theme_name}_home/{img}"
+        title = theme_name.capitalize()
+
         home_html += f"""
 <div class="col-md-4">
-<sl-card>
-<img src="{img_path}" class="gallery-img"
-loading="lazy"
-decoding="async"
-onclick="openLightbox(this)"
-alt="{title}">
-<div class="card-body">
-<h5>{title}</h5>
-<p>{desc}</p>
+<div class="row align-items-center">
+
+<div class="col-md-6">
+<img src="{img_path}" class="gallery-img">
 </div>
-</sl-card>
+
+<div class="col-md-6">
+<h4>{title}</h4>
+<a href="{theme_name}.html" class="btn btn-dark mt-2">
+View {title}
+</a>
+</div>
+
+</div>
 </div>
 """
 
-    # Banner section below featured images
     home_html += """
 </div>
 </section>
-<section class="banner">
-<img src="web_images/home_file/Royal Archway.jpg">
-<div class="banner-text">Explore the Gallery</div>
-<a href="gallery.html" class="banner-text">Explore the Gallery</a>
-</section>
-<footer class="text-center text-muted py-4 bg-light">
-<p>&copy; 2026 Warren Eyles</p>
-</footer>
-{lightbox_html}
 </body>
 </html>
-""".replace("{lightbox_html}", lightbox_html)
+"""
 
-    with open(os.path.join(base_dir,"index.html"),"w",encoding="utf-8") as f:
+    with open(os.path.join(base_dir, "index.html"), "w", encoding="utf-8") as f:
         f.write(home_html)
 
-    # --- Gallery Page ---
-    gallery_html=f"""
+    # =====================================================
+    # 7. INDIVIDUAL THEME PAGES
+    # =====================================================
+    for theme_name, data in themes.items():
+
+        html = f"""
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gallery</title>
+<title>{theme_name.capitalize()}</title>
 {bootstrap}
 {styles}
-{lightbox_script}
 </head>
 <body>
 {navbar}
-"""
-    for name, folder in gallery_folders.items():
-        images = get_images(folder)
-        gallery_html += f"""
+
 <section class="container my-5">
-<h2>{name}</h2>
+<h2 class="text-center mb-4">{theme_name.capitalize()}</h2>
+
 <div class="row g-3">
 """
-        folder_name = folder.split(os.sep)[-1]
+
+        images = get_images(data["gallery"])
+
         for img in images:
-            img_path = f"web_images/gallery_images/gallery_themes/{folder_name}/{img}"
+            folder = f"{theme_name}_gallery"
+            img_path = f"web_images/gallery_images/gallery_themes/{folder}/{img}"
+
             title, desc = get_meta(img_path)
-            gallery_html += f"""
+
+            html += f"""
 <div class="col-md-4">
 <sl-card>
-<img src="{img_path}" class="gallery-img"
-loading="lazy"
-decoding="async"
-onclick="openLightbox(this)"
-alt="{title}">
+<img src="{img_path}" class="gallery-img">
 <div class="card-body">
 <h5>{title}</h5>
 <p>{desc}</p>
@@ -308,42 +222,81 @@ alt="{title}">
 </sl-card>
 </div>
 """
-        gallery_html += "</div></section>"
 
-    gallery_html += f"""
-<footer class="text-start p-3" style="color:#666;">
-&copy; 2026 Waza Photography
-</footer>
-{lightbox_html}
+        html += """
+</div>
+</section>
 </body>
 </html>
-""".replace("{lightbox_html}", lightbox_html)
+"""
 
-    with open(os.path.join(base_dir,"gallery.html"),"w",encoding="utf-8") as f:
+        with open(os.path.join(base_dir, f"{theme_name}.html"), "w", encoding="utf-8") as f:
+            f.write(html)
+
+    # =====================================================
+    # 8. MAIN GALLERY PAGE (simple theme selector)
+    # =====================================================
+    gallery_html = f"""
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Gallery</title>
+{bootstrap}
+</head>
+<body>
+{navbar}
+
+<section class="container my-5 text-center">
+<h2>Select a Theme</h2>
+"""
+
+    for theme_name in themes:
+        gallery_html += f"""
+<a href="{theme_name}.html" class="btn btn-dark m-2">
+{theme_name.capitalize()}
+</a>
+"""
+
+    gallery_html += """
+</section>
+</body>
+</html>
+"""
+
+    with open(os.path.join(base_dir, "gallery.html"), "w", encoding="utf-8") as f:
         f.write(gallery_html)
 
-    # Auto push changes
+    # =====================================================
+    # 9. AUTO GIT PUSH (optional)
+    # =====================================================
     try:
-        subprocess.run(["git","add","."],check=True)
-        subprocess.run(["git","commit","-m","Auto update website"],check=True)
-        subprocess.run(["git","push"],check=True)
+        subprocess.run(["git", "add", "."], check=True)
+        subprocess.run(["git", "commit", "-m", "Auto update"], check=True)
+        subprocess.run(["git", "push"], check=True)
     except:
         pass
 
-# Watchdog
+# =========================================================
+# 10. WATCHDOG (auto update on image change)
+# =========================================================
 class Watcher(FileSystemEventHandler):
-    def on_modified(self,event):
-        if event.src_path.lower().endswith((".jpg",".jpeg",".png",".gif",".webp")):
+    def on_modified(self, event):
+        if event.src_path.lower().endswith((".jpg", ".png", ".jpeg", ".webp")):
             generate_website()
 
 generate_website()
+
 observer = Observer()
 observer.schedule(Watcher(), path=paths["main"], recursive=True)
 observer.start()
-print("Watching for changes")
+
+print("Watching for changes...")
+
 try:
     while True:
         time.sleep(1)
 except KeyboardInterrupt:
     observer.stop()
+
 observer.join()

@@ -3,7 +3,6 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Waza Photography</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -13,119 +12,11 @@
 <style>
 .gallery-img{
 width:100%;
-height:300px;
+height:250px;
 object-fit:cover;
 border-radius:6px;
-cursor:pointer;
 }
-.gallery-img:hover{
-transform:scale(1.05);
-transition:.3s;
-}
-.hero{
-position:relative;
-height:70vh;
-overflow:hidden;
-}
-.hero img{
-width:100%;
-height:100%;
-object-fit:cover;
-}
-.hero-text{
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-color:white;
-background:rgba(0,0,0,.45);
-padding:25px;
-border-radius:6px;
-text-align:center;
-}
-.banner{
-position:relative;
-height:40vh;
-margin:50px 0;
-overflow:hidden;
-border-radius:6px;
-}
-.banner img{
-width:100%;
-height:100%;
-object-fit:cover;
-opacity:0.8;
-}
-.banner-text{
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-color:white;
-font-size:2rem;
-text-align:center;
-background:rgba(0,0,0,0.45);
-padding:15px;
-border-radius:6px;
-}
-.lightbox{
-display:none;
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,.85);
-backdrop-filter:blur(6px);
-justify-content:center;
-align-items:center;
-z-index:9999;
-}
-.lightbox img{
-max-width:90%;
-max-height:90%;
-}
-.arrow{
-position:absolute;
-top:50%;
-font-size:3rem;
-color:white;
-cursor:pointer;
-user-select:none;
-padding:10px;
-}
-.arrow.left{left:15px;}
-.arrow.right{right:15px;}
 </style>
-
-
-<script>
-let galleryImages=[]
-let currentIndex=0
-function openLightbox(el){
-galleryImages=[...document.querySelectorAll('.gallery-img')]
-currentIndex=galleryImages.indexOf(el)
-updateLightbox()
-document.getElementById('lightbox').style.display='flex'
-}
-function closeLightbox(){
-document.getElementById('lightbox').style.display='none'
-}
-function updateLightbox(){
-const img=document.getElementById('lightbox-img')
-img.src=galleryImages[currentIndex].src
-}
-function prevImage(e){
-e.stopPropagation()
-currentIndex=(currentIndex-1+galleryImages.length)%galleryImages.length
-updateLightbox()
-}
-function nextImage(e){
-e.stopPropagation()
-currentIndex=(currentIndex+1)%galleryImages.length
-updateLightbox()
-}
-</script>
 
 </head>
 <body>
@@ -141,118 +32,47 @@ updateLightbox()
 </div>
 </nav>
 
-<header class="hero">
-<img src="web_images/home_file/Royal Archway.jpg" loading="eager">
-<div class="hero-text">
-<h1>Waza Photography</h1>
-<h2>Explore the world through my lens</h2>
-<p>Discover the captivating world of Waza Photography</p>
-</div>
-</header>
+
 <section class="container my-5">
-<h3 class="text-center mb-4">Featured Images</h3>
-<div class="row g-3">
+<h2 class="text-center mb-5">Explore My Work</h2>
+
+<div class="row g-4">
 
 <div class="col-md-4">
-<sl-card>
-<img src="web_images/home_file/Modern Building With Chimneys.jpg" class="gallery-img"
-loading="lazy"
-decoding="async"
-onclick="openLightbox(this)"
-alt="Modern Building With Chimneys">
-<div class="card-body">
-<h5>Modern Building With Chimneys</h5>
-<p></p>
-</div>
-</sl-card>
+<div class="row align-items-center">
+
+<div class="col-md-6">
+<img src="web_images/gallery_images/gallery_themes/nature_home/scanner flowers 1-9.jpg" class="gallery-img">
 </div>
 
-<div class="col-md-4">
-<sl-card>
-<img src="web_images/home_file/Royal Archway.jpg" class="gallery-img"
-loading="lazy"
-decoding="async"
-onclick="openLightbox(this)"
-alt="Royal Archway">
-<div class="card-body">
-<h5>Royal Archway</h5>
-<p></p>
+<div class="col-md-6">
+<h4>Nature</h4>
+<a href="nature.html" class="btn btn-dark mt-2">
+View Nature
+</a>
 </div>
-</sl-card>
+
+</div>
 </div>
 
 <div class="col-md-4">
-<sl-card>
-<img src="web_images/home_file/scanner flowers 1-9.jpg" class="gallery-img"
-loading="lazy"
-decoding="async"
-onclick="openLightbox(this)"
-alt="scanner flowers 1-9">
-<div class="card-body">
-<h5>scanner flowers 1-9</h5>
-<p></p>
-</div>
-</sl-card>
+<div class="row align-items-center">
+
+<div class="col-md-6">
+<img src="web_images/gallery_images/gallery_themes/landscape_home/_MG_1126.jpg" class="gallery-img">
 </div>
 
-<div class="col-md-4">
-<sl-card>
-<img src="web_images/home_file/Stormy Countryside.jpg" class="gallery-img"
-loading="lazy"
-decoding="async"
-onclick="openLightbox(this)"
-alt="Stormy Countryside">
-<div class="card-body">
-<h5>Stormy Countryside</h5>
-<p></p>
-</div>
-</sl-card>
+<div class="col-md-6">
+<h4>Landscape</h4>
+<a href="landscape.html" class="btn btn-dark mt-2">
+View Landscape
+</a>
 </div>
 
-<div class="col-md-4">
-<sl-card>
-<img src="web_images/home_file/Waza012.jpg" class="gallery-img"
-loading="lazy"
-decoding="async"
-onclick="openLightbox(this)"
-alt="Waza012">
-<div class="card-body">
-<h5>Waza012</h5>
-<p></p>
 </div>
-</sl-card>
-</div>
-
-<div class="col-md-4">
-<sl-card>
-<img src="web_images/home_file/Waza035.jpg" class="gallery-img"
-loading="lazy"
-decoding="async"
-onclick="openLightbox(this)"
-alt="Waza035">
-<div class="card-body">
-<h5>Waza035</h5>
-<p></p>
-</div>
-</sl-card>
 </div>
 
 </div>
 </section>
-<section class="banner">
-<img src="web_images/home_file/Royal Archway.jpg">
-<div class="banner-text">Explore the Gallery</div>
-<a href="gallery.html" class="banner-text">Explore the Gallery</a>
-</section>
-<footer class="text-center text-muted py-4 bg-light">
-<p>&copy; 2026 Warren Eyles</p>
-</footer>
-
-<div id="lightbox" class="lightbox" onclick="closeLightbox()">
-<span class="arrow left" onclick="prevImage(event)">&#10094;</span>
-<img id="lightbox-img">
-<span class="arrow right" onclick="nextImage(event)">&#10095;</span>
-</div>
-
 </body>
 </html>
