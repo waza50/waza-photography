@@ -6,7 +6,7 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
 # =========================================================
-# 1. PROJECT PATHS (edit if you move folders)
+# 1. PATHS
 # =========================================================
 base_dir = os.path.dirname(__file__)
 
@@ -17,7 +17,7 @@ paths = {
 }
 
 # =========================================================
-# 2. THEMES (add/remove themes here)
+# 2. THEMES
 # =========================================================
 themes = {
     "nature": {
@@ -35,7 +35,7 @@ themes = {
 }
 
 # =========================================================
-# 3. IMAGE METADATA (titles and descriptions)
+# 3. METADATA
 # =========================================================
 metadata_file = os.path.join(base_dir, "image_data.json")
 
@@ -58,37 +58,29 @@ def get_images(folder):
         if os.path.isfile(os.path.join(folder, f))
         and f.lower().endswith((".png", ".jpg", ".jpeg", ".webp"))
     ]
+
 def get_meta(path):
     meta = image_metadata.get(path.replace("\\", "/"), {})
-    title = meta.get("title", os.path.splitext(os.path.basename(path))[0])
-    desc = meta.get("description", "")
-    return title, desc
+    return meta.get("title", os.path.basename(path)), meta.get("description", "")
 
 # =========================================================
-# 4. UI COMPONENTS 
+# 4. UI
 # =========================================================
-
-# Navbar links
 navbar = """
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 <div class="container-fluid">
 <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
 <li class="nav-item"><a class="nav-link" href="gallery.html">Gallery</a></li>
-<li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
-<li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
 </ul>
 </div>
 </nav>
 """
 
-# External libraries
 bootstrap = """
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2/dist/shoelace.js"></script>
 """
 
-# Styles
 styles = """
 <style>
 .gallery-img{
@@ -101,27 +93,25 @@ border-radius:6px;
 """
 
 # =========================================================
-# 5. GENERATE WEBSITE
+# 5. GENERATE SITE
 # =========================================================
 def generate_website():
 
-    # Ensure metadata exists for all images
-    all_folders = [paths["home"]]
+    # --------------------------
+    # METADATA AUTO-FILL
+    # --------------------------
     for t in themes.values():
-        all_folders.append(t["home"])
-        all_folders.append(t["gallery"])
+        for folder in [t["home"], t["gallery"]]:
+            for img in get_images(folder):
+                full_path = os.path.join(folder, img).replace("\\", "/")
+                if full_path not in image_metadata:
+                    image_metadata[full_path] = {"title": "", "description": ""}
 
-    for folder in all_folders:
-        for img in get_images(folder):
-            path = os.path.join(folder, img).replace("\\", "/")
-            if path not in image_metadata:
-                image_metadata[path] = {"title": "", "description": ""}
-
-    with open(metadata_file, "w", encoding="utf-8") as f:
+    with open(metadata_file, "w") as f:
         json.dump(image_metadata, f, indent=4)
 
     # =====================================================
-    # 6. HOME PAGE 
+    # HOME PAGE
     # =====================================================
     home_html = f"""
 <!DOCTYPE html>
@@ -136,19 +126,19 @@ def generate_website():
 {navbar}
 
 <section class="container my-5">
-<h2 class="text-center mb-5">Explore My Work</h2>
-
 <div class="row g-4">
 """
 
-    # Theme preview section (image + button)
     for theme_name, data in themes.items():
         images = get_images(data["home"])
         if not images:
             continue
 
         img = images[0]
-        img_path = f"web_images/gallery_images/gallery_themes/{theme_name}_home/{img}"
+
+        # IMPORTANT FIX: real relative path
+        rel_path = os.path.relpath(os.path.join(data["home"], img), base_dir).replace("\\", "/")
+
         title = theme_name.capitalize()
 
         home_html += f"""
@@ -156,32 +146,25 @@ def generate_website():
 <div class="row align-items-center">
 
 <div class="col-md-6">
-<img src="{img_path}" class="gallery-img">
+<img src="{rel_path}" class="gallery-img">
 </div>
 
 <div class="col-md-6">
 <h4>{title}</h4>
-<a href="{theme_name}.html" class="btn btn-dark mt-2">
-View {title}
-</a>
+<a href="{theme_name}.html" class="btn btn-dark mt-2">View {title}</a>
 </div>
 
 </div>
 </div>
 """
 
-    home_html += """
-</div>
-</section>
-</body>
-</html>
-"""
+    home_html += "</div></section></body></html>"
 
-    with open(os.path.join(base_dir, "index.html"), "w", encoding="utf-8") as f:
+    with open(os.path.join(base_dir, "index.html"), "w") as f:
         f.write(home_html)
 
     # =====================================================
-    # 7. INDIVIDUAL THEME PAGES
+    # THEME PAGES (THIS FIXES YOUR IMAGE ISSUE)
     # =====================================================
     for theme_name, data in themes.items():
 
@@ -190,7 +173,7 @@ View {title}
 <html>
 <head>
 <meta charset="UTF-8">
-<title>{theme_name.capitalize()}</title>
+<title>{theme_name}</title>
 {bootstrap}
 {styles}
 </head>
@@ -198,43 +181,30 @@ View {title}
 {navbar}
 
 <section class="container my-5">
-<h2 class="text-center mb-4">{theme_name.capitalize()}</h2>
-
 <div class="row g-3">
 """
 
-        images = get_images(data["gallery"])
+        for img in get_images(data["gallery"]):
 
-        for img in images:
-            folder = f"{theme_name}_gallery"
-            img_path = f"web_images/gallery_images/gallery_themes/{folder}/{img}"
+            full_path = os.path.join(data["gallery"], img)
+            rel_path = os.path.relpath(full_path, base_dir).replace("\\", "/")
 
-            title, desc = get_meta(img_path)
+            title, desc = get_meta(full_path)
 
             html += f"""
 <div class="col-md-4">
-<sl-card>
-<img src="{img_path}" class="gallery-img">
-<div class="card-body">
-<h5>{title}</h5>
-<p>{desc}</p>
-</div>
-</sl-card>
+<img src="{rel_path}" class="gallery-img">
+<p>{title}</p>
 </div>
 """
 
-        html += """
-</div>
-</section>
-</body>
-</html>
-"""
+        html += "</div></section></body></html>"
 
-        with open(os.path.join(base_dir, f"{theme_name}.html"), "w", encoding="utf-8") as f:
+        with open(os.path.join(base_dir, f"{theme_name}.html"), "w") as f:
             f.write(html)
 
     # =====================================================
-    # 8. MAIN GALLERY PAGE (simple theme selector)
+    # GALLERY PAGE (NO TEXT, JUST BUTTONS)
     # =====================================================
     gallery_html = f"""
 <!DOCTYPE html>
@@ -248,7 +218,6 @@ View {title}
 {navbar}
 
 <section class="container my-5 text-center">
-<h2>Select a Theme</h2>
 """
 
     for theme_name in themes:
@@ -258,17 +227,13 @@ View {title}
 </a>
 """
 
-    gallery_html += """
-</section>
-</body>
-</html>
-"""
+    gallery_html += "</section></body></html>"
 
-    with open(os.path.join(base_dir, "gallery.html"), "w", encoding="utf-8") as f:
+    with open(os.path.join(base_dir, "gallery.html"), "w") as f:
         f.write(gallery_html)
 
     # =====================================================
-    # 9. AUTO GIT PUSH (optional)
+    # AUTO GIT PUSH
     # =====================================================
     try:
         subprocess.run(["git", "add", "."], check=True)
@@ -278,7 +243,7 @@ View {title}
         pass
 
 # =========================================================
-# 10. WATCHDOG (auto update on image change)
+# WATCHDOG
 # =========================================================
 class Watcher(FileSystemEventHandler):
     def on_modified(self, event):
