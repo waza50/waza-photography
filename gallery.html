@@ -10,7 +10,7 @@
 
 
 <style>
-/* Featured images only */
+/* Featured images */
 .featured-img {
   width: 100%;
   height: 300px;
@@ -19,7 +19,13 @@
   margin-bottom: 10px;
 }
 
-/* Other images */
+/* Lazy-loaded images (remaining featured images) */
+.featured-img.lazy {
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
+/* Other gallery images */
 .gallery-img{
   width:100%;
   height:auto;
@@ -76,6 +82,23 @@ padding:15px;
 border-radius:6px;
 }
 </style>
+<script>
+// Lazy loading script for additional featured images
+document.addEventListener("DOMContentLoaded", function() {
+  const lazyImages = document.querySelectorAll('img.lazy');
+  const observer = new IntersectionObserver((entries, obs) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        const img = entry.target;
+        img.src = img.dataset.src;
+        img.onload = () => { img.style.opacity = 1; }
+        obs.unobserve(img);
+      }
+    });
+  }, {rootMargin: "50px"});
+  lazyImages.forEach(img => observer.observe(img));
+});
+</script>
 
 </head>
 <body>

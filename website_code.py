@@ -17,7 +17,7 @@ paths = {
 }
 
 # =========================================================
-# 2. THEMES (added architecture)
+# 2. THEMES
 # =========================================================
 themes = {
     "nature": {
@@ -32,7 +32,7 @@ themes = {
         "home": os.path.join(paths["themes"], "portraiture_home"),
         "gallery": os.path.join(paths["themes"], "portraiture_gallery")
     },
-    "architecture": {   # New theme
+    "architecture": {
         "home": os.path.join(paths["themes"], "architecture_home"),
         "gallery": os.path.join(paths["themes"], "architecture_gallery")
     }
@@ -88,7 +88,7 @@ bootstrap = """
 
 styles = """
 <style>
-/* Featured images only */
+/* Featured images */
 .featured-img {
   width: 100%;
   height: 300px;
@@ -97,7 +97,13 @@ styles = """
   margin-bottom: 10px;
 }
 
-/* Other images */
+/* Lazy-loaded images (remaining featured images) */
+.featured-img.lazy {
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
+/* Other gallery images */
 .gallery-img{
   width:100%;
   height:auto;
@@ -154,6 +160,23 @@ padding:15px;
 border-radius:6px;
 }
 </style>
+<script>
+// Lazy loading script for additional featured images
+document.addEventListener("DOMContentLoaded", function() {
+  const lazyImages = document.querySelectorAll('img.lazy');
+  const observer = new IntersectionObserver((entries, obs) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        const img = entry.target;
+        img.src = img.dataset.src;
+        img.onload = () => { img.style.opacity = 1; }
+        obs.unobserve(img);
+      }
+    });
+  }, {rootMargin: "50px"});
+  lazyImages.forEach(img => observer.observe(img));
+});
+</script>
 """
 
 # =========================================================
@@ -208,7 +231,8 @@ def generate_website():
 <div class="row g-3">
 """
 
-    for img in home_images:
+    # First 6 images load normally
+    for img in home_images[:6]:
         img_path = os.path.join(paths["home"], img)
         rel_path = os.path.relpath(img_path, base_dir).replace("\\", "/")
         title, desc = get_meta(img_path)
@@ -216,6 +240,23 @@ def generate_website():
 <div class="col-md-4">
 <sl-card>
 <img src="{rel_path}" class="featured-img" loading="lazy" decoding="async" alt="{title}">
+<div class="card-body">
+<h5>{title}</h5>
+<p>{desc}</p>
+</div>
+</sl-card>
+</div>
+"""
+
+    # Remaining images lazy-load
+    for img in home_images[6:]:
+        img_path = os.path.join(paths["home"], img)
+        rel_path = os.path.relpath(img_path, base_dir).replace("\\", "/")
+        title, desc = get_meta(img_path)
+        home_html += f"""
+<div class="col-md-4">
+<sl-card>
+<img data-src="{rel_path}" class="featured-img lazy" alt="{title}">
 <div class="card-body">
 <h5>{title}</h5>
 <p>{desc}</p>
